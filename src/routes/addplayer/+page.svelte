@@ -14,7 +14,7 @@
 		teams = [
 			...teams,
 			{
-				team: `/team/${newTeam.id}`,
+				team: newTeam.id,
 				displayTeam: `${newTeam.location} ${newTeam.team}`,
 				startYear: newStart,
 				endYear: newEnd
