@@ -10,11 +10,19 @@
 	let teamLocation;
 	let teamName;
 	let newTeam;
-	$: newTeam = {
-		id: `${teamLocation}${teamName}`,
-		team: teamName,
-		location: teamLocation
-	};
+	let startYear;
+	let endYear;
+	$: {
+		newTeam = {
+			id: `${teamLocation}${teamName}`?.replace(/\s/g, ''),
+			team: teamName,
+			location: teamLocation,
+			startYear: startYear
+		};
+		if (endYear) {
+			newTeam.endYear = endYear;
+		}
+	}
 
 	function _onCancel() {
 		onCancel();
@@ -22,51 +30,66 @@
 	}
 
 	async function _onOkay() {
-		await setDoc(doc(db, 'team', newTeam.id), newTeam);
-		onOkay(newTeam);
-		close();
+		if ( newTeam ) {
+			await setDoc(doc(db, 'team', newTeam.id), newTeam);
+			onOkay(newTeam);
+			close();
+		}
 	}
-
 </script>
-
-<style>
-    h2 {
-        font-size: 2rem;
-        text-align: center;
-    }
-
-    input {
-        width: 100%;
-    }
-
-    .buttons {
-        display: flex;
-        justify-content: space-between;
-    }
-</style>
 
 <h2>New Team</h2>
 
-<label for='location'>Location</label>
+<label for="location">Location</label>
 <input
-	id='location'
+	id="location"
 	type="text"
 	bind:value={teamLocation}
-	on:keydown={e => e.which === 13 && _onOkay()} />
-<br/>
-<label for='name'>Team Name</label>
+	on:keydown={(e) => e.which === 13 && _onOkay()}
+/>
+<br />
+<label for="name">Team Name</label>
 <input
-	id='name'
+	id="name"
 	type="text"
 	bind:value={teamName}
-	on:keydown={e => e.which === 13 && _onOkay()} />
-<br/>
+	on:keydown={(e) => e.which === 13 && _onOkay()}
+/>
+<br />
+<label for="startYear">Start Year</label>
+<input
+	id="startYear"
+	type="text"
+	bind:value={startYear}
+	on:keydown={(e) => e.which === 13 && _onOkay()}
+/>
+<br />
+<label for="endYear">End Year</label>
+<input
+	id="endYear"
+	type="text"
+	bind:value={endYear}
+	on:keydown={(e) => e.which === 13 && _onOkay()}
+/>
+<br />
 
 <div class="buttons">
-	<button on:click={_onCancel}>
-		Cancel
-	</button>
-	<button on:click={_onOkay}>
-		Okay
-	</button>
+	<button on:click={_onCancel}> Cancel </button>
+	<button on:click={_onOkay}> Okay </button>
 </div>
+
+<style>
+	h2 {
+		font-size: 2rem;
+		text-align: center;
+	}
+
+	input {
+		width: 100%;
+	}
+
+	.buttons {
+		display: flex;
+		justify-content: space-between;
+	}
+</style>

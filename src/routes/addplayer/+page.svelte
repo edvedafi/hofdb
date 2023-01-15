@@ -13,30 +13,20 @@
 		firstName = '';
 		lastName = '';
 		teams = [];
-		resetTimeframe();
 	};
 
-	let newTeam;
-	let newStart;
-	let newEnd;
-
-	const resetTimeframe = () => {
-		newTeam = undefined;
-		newStart = undefined;
-		newEnd = undefined;
-	};
-
-	function addTeam() {
-		teams = [
-			...teams,
-			{
-				team: newTeam.id,
-				displayTeam: `${newTeam.location} ${newTeam.team}`,
-				startYear: newStart,
-				endYear: newEnd
-			}
-		];
-		resetTimeframe();
+	function addTeam(newTeam, newStart, newEnd) {
+		if ( newTeam ) {
+			teams = [
+				...teams,
+				{
+					team: newTeam.id,
+					displayTeam: `${newTeam.location} ${newTeam.team}`,
+					startYear: newStart,
+					endYear: newEnd
+				}
+			];
+		}
 	}
 
 	$: player = {
@@ -69,13 +59,7 @@
 		<p>{team.displayTeam} {team.startYear} - {team.endYear}</p>
 	{/each}
 
-	<AddTimeframe
-		{data}
-		bind:startYear={newStart}
-		bind:endYear={newEnd}
-		bind:selected={newTeam}
-		on:click={addTeam}
-	/>
+	<AddTimeframe {data} onSave={addTeam} />
 
 	<p>
 		<button on:click={save}>Save {firstName}{lastName}</button>

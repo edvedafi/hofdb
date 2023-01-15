@@ -1,5 +1,6 @@
 import firestore from '../../utils/firestore';
 import { collection, getDocs } from 'firebase/firestore';
+import _ from 'lodash';
 
 export async function load() {
 	const teams = [];
@@ -9,5 +10,5 @@ export async function load() {
 		teams.push({ id: doc.id, ...doc.data() });
 	});
 
-	return { teams };
+	return { teams: _.sortBy(teams, ['location', 'team']) };
 }
