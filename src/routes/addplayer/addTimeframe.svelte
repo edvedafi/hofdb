@@ -22,8 +22,8 @@
 
 <TeamSelectField bind:teams={data.teams} bind:selected={selected}/>
 
-<input bind:value={startYear} type="number" on:blur={startFourDigit}/> - <input bind:value={endYear} type="number" on:blur={endFourDigit}/>
+<input bind:value={startYear} type="number" autocomplete="off" on:blur={startFourDigit}/> - <input bind:value={endYear} type="number" autocomplete="off" on:blur={endFourDigit}/>
 
 <button on:click disabled={invalid}>
-	Add Team
+	Add Timeframe
 </button>
