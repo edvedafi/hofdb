@@ -1,4 +1,5 @@
 <script>
+	import TeamSelectField from '../../components/teamSelectField.svelte'
 	export let selected;
 	export let data;
 	export let startYear;
@@ -19,14 +20,7 @@
 	const endFourDigit = () => endYear = (endYear && endYear > 9 && endYear < 100 ? 1900 + endYear : endYear);
 </script>
 
-<select bind:value={selected}>
-	{#each data.teams as team}
-		<option value={team}>
-			{team.location}
-			{team.team}
-		</option>
-	{/each}
-</select>
+<TeamSelectField bind:teams={data.teams} bind:selected={selected}/>
 
 <input bind:value={startYear} type="number" on:blur={startFourDigit}/> - <input bind:value={endYear} type="number" on:blur={endFourDigit}/>
 
