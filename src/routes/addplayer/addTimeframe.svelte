@@ -7,6 +7,8 @@
 	let startYear;
 	let endYear;
 	export let onSave = () => {};
+	let teamList;
+	let teamOutput = '';
 
 	let invalid;
 
@@ -36,7 +38,45 @@
 		selected = undefined;
 		startYear = undefined;
 		endYear = undefined;
+		teamList = '';
 		focusAfterSave.focus();
+	};
+
+	const processText = () => {
+		if (teamList) {
+			const timeframes = teamList.split(')');
+			timeframes.forEach((timeframe) => {
+				const tfsplit = timeframe.split('(');
+				const team = data.teams.find((team) => team.id === tfsplit[0]?.replace(/\s/g, ''));
+				if (team) {
+					const years = tfsplit[1].split(', ');
+					years.forEach((year) => {
+						const [start, end] = year.split('–');
+						if (start >= team.startYear) {
+							if (!end) {
+								onSave(team, start, start, role);
+							} else if (end <= (team.endYear || 2020)) {
+								onSave(team, start, end, role);
+							} else {
+								alert(
+									`End Year of ${end} is after the end year of ${tfsplit[0]} in ${team.endYear}`
+								);
+							}
+						} else {
+							alert(
+								`Start Year of ${start} is before the starting year of ${tfsplit[0]} in ${team.startYear}`
+							);
+						}
+					});
+				} else {
+					//don't error on the last record
+					if (tfsplit[0]) {
+						alert(`Could not find a team named ${tfsplit[0]}`);
+					}
+				}
+			});
+		}
+		teamList = '';
 	};
 </script>
 
@@ -70,3 +110,10 @@
 </select>
 
 <button on:click={_onSave} disabled={invalid}> Add Timeframe </button>
+
+<p>
+	<textarea bind:value={teamList} />
+	<button on:click={processText}> Add Timeframes </button>
+</p>
+
+<p>{teamOutput}</p>
