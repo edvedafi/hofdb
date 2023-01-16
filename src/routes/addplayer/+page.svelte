@@ -9,11 +9,15 @@
 	let firstName = '';
 	let lastName = '';
 	let teams = [];
+	let role = 'player'
+	let focusAfterSave;
 
 	const resetPlayer = () => {
 		firstName = '';
 		lastName = '';
 		teams = [];
+		role = 'player';
+		focusAfterSave.focus();
 	};
 
 	function addTeam(newTeam, newStart, newEnd, role) {
@@ -47,7 +51,7 @@
 	<h1>Add Player</h1>
 	<div>
 		<label for="firstName">First name:</label>
-		<input id="firstName" autocomplete="off" bind:value={firstName} />
+		<input id="firstName" autocomplete="off" bind:value={firstName} bind:this={focusAfterSave}/>
 	</div>
 	<div>
 		<label for="lastName">Last name:</label>
@@ -57,10 +61,10 @@
 	<h2>Add Played For Timeframe</h2>
 
 	{#each teams as team}
-		<p>{team.displayTeam} {team.startYear} - {team.endYear}</p>
+		<p>{team.displayTeam}{#if team.role !== 'player'}({team.role}){/if} {team.startYear} {#if team.endYear !== team.startYear}- {team.endYear} {/if}</p>
 	{/each}
 
-	<AddTimeframe {data} onSave={addTeam} />
+	<AddTimeframe {data} bind:role={role} onSave={addTeam} />
 
 	<p>
 		<button on:click={save}>Save {firstName}{lastName}</button>

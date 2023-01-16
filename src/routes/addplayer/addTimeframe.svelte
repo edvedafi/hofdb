@@ -2,7 +2,7 @@
 	import TeamSelectField from '../../components/teamSelectField.svelte';
 	let selected;
 	let focusAfterSave;
-	let role = 'player';
+	export let role = 'player';
 	export let data;
 	let startYear;
 	let endYear;
@@ -66,6 +66,7 @@
 	<option value={'assistant'}>Assistant</option>
 	<option value={'gm'}>GM</option>
 	<option value={'exec'}>Exec</option>
+	<option value={'umpire'}>Umpire</option>
 </select>
 
 <button on:click={_onSave} disabled={invalid}> Add Timeframe </button>
