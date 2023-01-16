@@ -2,16 +2,18 @@
 	import Dialog from '../components/addTeamModal.svelte';
 
 	import { getContext } from 'svelte';
+	import _ from 'lodash';
 
 	export let selected;
 	export let teams;
+	export let inputForFocus;
 
 	const onCancel = () => {
 		selected = null;
 	}
 
 	const onOkay = async (newTeam) => {
-		teams = [...teams, newTeam];
+		teams = _.sortBy([...teams, newTeam], ['location', 'team']);
 		selected = newTeam;
 	}
 
@@ -35,7 +37,7 @@
 	const { open } = getContext('simple-modal');
 </script>
 
-<select bind:value={selected} on:change={showDialog}>
+<select bind:this={inputForFocus} bind:value={selected} on:change={showDialog}>
 	<option value={null}>
 	</option>
 	{#each teams as team}

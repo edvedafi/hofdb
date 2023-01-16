@@ -4,6 +4,7 @@
 	import AddTimeframe from './addTimeframe.svelte';
 	import Modal from '../../components/Modal.svelte';
 	import { modal } from '../../stores/Modal.store.js';
+	import _ from 'lodash';
 	export let data;
 	let firstName = '';
 	let lastName = '';
@@ -15,17 +16,17 @@
 		teams = [];
 	};
 
-	function addTeam(newTeam, newStart, newEnd) {
+	function addTeam(newTeam, newStart, newEnd, role) {
 		if ( newTeam ) {
-			teams = [
-				...teams,
-				{
-					team: newTeam.id,
-					displayTeam: `${newTeam.location} ${newTeam.team}`,
-					startYear: newStart,
-					endYear: newEnd
-				}
-			];
+			teams.push({
+				team: newTeam.id,
+				displayTeam: `${newTeam.location} ${newTeam.team}`,
+				startYear: newStart,
+				endYear: newEnd || newStart,
+				role: role
+			});
+
+			teams = _.sortBy(teams, ['startYear']);
 		}
 	}
 
