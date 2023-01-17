@@ -42,32 +42,59 @@
 		focusAfterSave.focus();
 	};
 
+	const processYear = (team, start, end) => {
+		if (start >= team.startYear) {
+			if (!end) {
+				onSave(team, start, start, role);
+			} else if (end <= (team.endYear || 2020)) {
+				onSave(team, start, end, role);
+			} else {
+				alert(
+					`End Year of ${end} is after the end year of ${team.displayName} in ${team.endYear}`
+				);
+			}
+		} else {
+			alert(
+				`Start Year of ${start} is before the starting year of ${team.displayName} in ${team.startYear}`
+			);
+		}}
+
+	const processYears = (team, year) => {
+		console.log('    processing year : ', year)
+		if ( year.indexOf(',') > 0 ) {
+			console.log('    year still has a ,')
+			const years = year.split(',');
+			years.forEach((y) => processYears(team, y));
+			console.log('    finished recursion for ,')
+		} else if ( year.indexOf('; ') > 0 ) {
+			console.log('    year  has a ;(space)')
+			const years = year.split('; ');
+			years.forEach((y) => processYears(team, y));
+			console.log('    finished recursion for ;(space)')
+		} else if ( year.indexOf(';') > 0 ) {
+			console.log('    year  has a ;')
+			const years = year.split(';');
+			years.forEach((y) => processYears(team, y));
+			console.log('    finished recursion for ;')
+		} else {
+			console.log('got to a good year', year)
+			const [start, end] = year.split('–');
+			processYear(team, start, end)
+		}
+	}
+
 	const processText = () => {
 		if (teamList) {
 			const timeframes = teamList.split(')');
 			timeframes.forEach((timeframe) => {
 				const tfsplit = timeframe.split('(');
+				console.log('processing: ', tfsplit)
 				const team = data.teams.find((team) => team.id === tfsplit[0]?.replace(/\s/g, ''));
 				if (team) {
-					const years = tfsplit[1].split(', ');
-					years.forEach((year) => {
-						const [start, end] = year.split('–');
-						if (start >= team.startYear) {
-							if (!end) {
-								onSave(team, start, start, role);
-							} else if (end <= (team.endYear || 2020)) {
-								onSave(team, start, end, role);
-							} else {
-								alert(
-									`End Year of ${end} is after the end year of ${tfsplit[0]} in ${team.endYear}`
-								);
-							}
-						} else {
-							alert(
-								`Start Year of ${start} is before the starting year of ${tfsplit[0]} in ${team.startYear}`
-							);
-						}
-					});
+					const yearString = tfsplit[1];
+					const years = yearString.split(', ');
+					console.log('  processing year string: ', yearString)
+					years.forEach((year) => processYears(team, year));
 				} else {
 					//don't error on the last record
 					if (tfsplit[0]) {

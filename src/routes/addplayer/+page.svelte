@@ -40,6 +40,16 @@
 		teams: teams
 	};
 
+	const pasteFirstName = (e)=> {
+		// Get pasted data via clipboard API
+		const clipboardData = e.clipboardData || window.clipboardData;
+		const pastedData = clipboardData.getData('Text');
+		e.stopPropagation();
+		e.preventDefault();
+
+		[firstName, lastName] = pastedData.split(' ');
+	}
+
 	async function save() {
 		console.log(`Creating document: ${firstName}${lastName}`, player);
 		await setDoc(doc(db, 'players', `${firstName}${lastName}`), player);
@@ -51,7 +61,7 @@
 	<h1>Add Player</h1>
 	<div>
 		<label for="firstName">First name:</label>
-		<input id="firstName" autocomplete="off" bind:value={firstName} bind:this={focusAfterSave}/>
+		<input id="firstName" autocomplete="off" bind:value={firstName} bind:this={focusAfterSave} on:paste={pasteFirstName}/>
 	</div>
 	<div>
 		<label for="lastName">Last name:</label>
