@@ -60,11 +60,13 @@
 			} else if (end <= (team.endYear || 2020)) {
 				onSave(team, start, end, role);
 			} else {
+				teamList = `${teamList}\n${team.location} ${team.team} (${start} - ${end})`
 				alert(
 					`End Year of ${end} is after the end year of ${team.location} ${team.team} in ${team.endYear}`
 				);
 			}
 		} else {
+			teamList = `${teamList}\n${team.location} ${team.team} (${start} - ${end})`
 			alert(
 				`Start Year of ${start} is before the starting year of ${team.location} ${team.team} in ${team.startYear}`
 			);
@@ -106,6 +108,7 @@
 			//don't error on the last record
 			if (teamString) {
 				alert(`Could not find a team named ${teamString}`);
+				teamList = `${teamList}\n${teamString} (${yearString})`
 			}
 		}
 	};
@@ -114,6 +117,7 @@
 		if (teamList) {
 			teamList = teamList.replace(/\[\d\]/g, '');
 			const timeframes = teamList.split(')');
+			teamList = '';
 			timeframes.forEach((timeframe) => {
 				const tfsplit = timeframe.trim().split('(');
 				console.log('processing: ', tfsplit);
@@ -131,7 +135,6 @@
 				}
 			});
 		}
-		teamList = '';
 	};
 </script>
 
