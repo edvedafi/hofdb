@@ -1,5 +1,6 @@
 <script>
 	import TeamSelectField from '../../components/teamSelectField.svelte';
+	import _ from 'lodash';
 	let selected;
 	let focusAfterSave;
 	export let role = 'player';
@@ -42,7 +43,17 @@
 		focusAfterSave.focus();
 	};
 
-	const processYear = (team, start, end) => {
+	const processYear = (team, start, end, limitToTeamYears) => {
+		if (limitToTeamYears) {
+			start = _.max([start, team.startYear]);
+			if ( end ) {
+				console.log(`Setting end year to min of ${end} and  ${team.endYear}`);
+				end = _.min([end, team.endYear]);
+				console.log(`Choose ${end}`)
+			} else {
+				end = start;
+			}
+		}
 		if (start >= team.startYear) {
 			if (!end) {
 				onSave(team, start, start, role);
@@ -50,56 +61,73 @@
 				onSave(team, start, end, role);
 			} else {
 				alert(
-					`End Year of ${end} is after the end year of ${team.displayName} in ${team.endYear}`
+					`End Year of ${end} is after the end year of ${team.location} ${team.team} in ${team.endYear}`
 				);
 			}
 		} else {
 			alert(
-				`Start Year of ${start} is before the starting year of ${team.displayName} in ${team.startYear}`
+				`Start Year of ${start} is before the starting year of ${team.location} ${team.team} in ${team.startYear}`
 			);
-		}}
-
-	const processYears = (team, year) => {
-		console.log('    processing year : ', year)
-		if ( year.indexOf(',') > 0 ) {
-			console.log('    year still has a ,')
-			const years = year.split(',');
-			years.forEach((y) => processYears(team, y));
-			console.log('    finished recursion for ,')
-		} else if ( year.indexOf('; ') > 0 ) {
-			console.log('    year  has a ;(space)')
-			const years = year.split('; ');
-			years.forEach((y) => processYears(team, y));
-			console.log('    finished recursion for ;(space)')
-		} else if ( year.indexOf(';') > 0 ) {
-			console.log('    year  has a ;')
-			const years = year.split(';');
-			years.forEach((y) => processYears(team, y));
-			console.log('    finished recursion for ;')
-		} else {
-			console.log('got to a good year', year)
-			const [start, end] = year.split('–');
-			processYear(team, start, end)
 		}
-	}
+	};
+
+	const processYears = (team, year, limitToTeamYears) => {
+		console.log('    processing year : ', year);
+		if (year.indexOf(',') > 0) {
+			console.log('    year still has a ,');
+			const years = year.split(',');
+			years.forEach((y) => processYears(team, y, limitToTeamYears));
+			console.log('    finished recursion for ,');
+		} else if (year.indexOf('; ') > 0) {
+			console.log('    year  has a ;(space)');
+			const years = year.split('; ');
+			years.forEach((y) => processYears(team, y, limitToTeamYears));
+			console.log('    finished recursion for ;(space)');
+		} else if (year.indexOf(';') > 0) {
+			console.log('    year  has a ;');
+			const years = year.split(';');
+			years.forEach((y) => processYears(team, y, limitToTeamYears));
+			console.log('    finished recursion for ;');
+		} else {
+			console.log('got to a good year', year);
+			const [start, end] = year.split('–');
+			processYear(team, start, end, limitToTeamYears);
+		}
+	};
+
+	const processTeam = (teamString, yearString, limitToTeamYears) => {
+		console.log(`  Searching for team ID: ${teamString?.replace(/\s/g, '')}`);
+		const team = data.teams.find((team) => team.id === teamString?.replace(/\s/g, ''));
+		if (team) {
+			const years = yearString.split(', ');
+			console.log('  processing year string: ', yearString);
+			years.forEach((year) => processYears(team, year, limitToTeamYears));
+		} else {
+			//don't error on the last record
+			if (teamString) {
+				alert(`Could not find a team named ${teamString}`);
+			}
+		}
+	};
 
 	const processText = () => {
 		if (teamList) {
+			teamList = teamList.replace(/\[\d\]/g, '');
 			const timeframes = teamList.split(')');
 			timeframes.forEach((timeframe) => {
-				const tfsplit = timeframe.split('(');
-				console.log('processing: ', tfsplit)
-				const team = data.teams.find((team) => team.id === tfsplit[0]?.replace(/\s/g, ''));
-				if (team) {
-					const yearString = tfsplit[1];
-					const years = yearString.split(', ');
-					console.log('  processing year string: ', yearString)
-					years.forEach((year) => processYears(team, year));
+				const tfsplit = timeframe.trim().split('(');
+				console.log('processing: ', tfsplit);
+				const teamString = tfsplit[0].trim();
+				console.log('  testing teamString: ', teamString);
+				if (teamString.indexOf('/') > 0) {
+					const nameIndex = teamString.lastIndexOf(' ');
+					const teamName = teamString.slice(nameIndex);
+					const teams = teamString.substring(0, nameIndex).split('/');
+					teams.forEach((teamLocation) =>
+						processTeam(`${teamLocation}${teamName}`, tfsplit[1], true)
+					);
 				} else {
-					//don't error on the last record
-					if (tfsplit[0]) {
-						alert(`Could not find a team named ${tfsplit[0]}`);
-					}
+					processTeam(tfsplit[0], tfsplit[1]);
 				}
 			});
 		}
