@@ -7,8 +7,8 @@
 	import ManageTimeFrame from './manageTimeFrames.svelte';
 
 	export let data;
-	let firstName = '';
-	let lastName = '';
+	let firstName = data?.player?.firstName || '';
+	let lastName = data?.player?.lastName ||  '';
 	let focusAfterSave;
 
 	const resetPlayer = () => {
@@ -21,7 +21,7 @@
 	$: player = {
 		firstName: firstName,
 		lastName: lastName,
-		teams: player?.teams || []
+		teams: player?.teams || data?.player?.teams ||  []
 	};
 
 	$: id = getKey(firstName + lastName)

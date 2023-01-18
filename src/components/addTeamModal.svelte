@@ -2,7 +2,6 @@
 	import { getContext } from 'svelte';
 	import { doc, setDoc } from 'firebase/firestore';
 	import db from '../utils/firestore';
-	import _ from 'lodash';
 	export let onCancel = () => {};
 	export let onOkay = () => {};
 
