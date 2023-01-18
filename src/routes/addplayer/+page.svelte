@@ -1,6 +1,7 @@
 <script>
 	import { doc, setDoc } from 'firebase/firestore';
 	import db from '../../utils/firestore';
+	import {getKey} from '../../utils/firebase';
 	import Modal from '../../components/Modal.svelte';
 	import { modal } from '../../stores/Modal.store.js';
 	import ManageTimeFrame from './manageTimeFrames.svelte';
@@ -23,7 +24,7 @@
 		teams: player?.teams || []
 	};
 
-	$: id = `${firstName}${lastName}`.replace(/\s/g, '')
+	$: id = getKey(firstName + lastName)
 
 	const pasteFirstName = (e)=> {
 		// Get pasted data via clipboard API
@@ -37,8 +38,13 @@
 
 	async function save() {
 		console.log(`Creating document: ${id}`, player);
-		await setDoc(doc(db, 'players', id), player);
-		resetPlayer();
+		try {
+			await setDoc(doc(db, 'players', id), player);
+			resetPlayer();
+		} catch (e) {
+			console.log(e);
+			alert(e.message)
+		}
 	}
 </script>
 

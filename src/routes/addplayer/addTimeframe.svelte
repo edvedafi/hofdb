@@ -1,5 +1,6 @@
 <script>
 	import TeamSelectField from '../../components/teamSelectField.svelte';
+	import { getKey } from '../../utils/firebase';
 	import _ from 'lodash';
 	export let selected;
 	let focusAfterSave;
@@ -98,8 +99,9 @@
 	};
 
 	const processTeam = (teamString, yearString, limitToTeamYears) => {
-		console.log(`  Searching for team ID: ${teamString?.replace(/\s/g, '')}`);
-		const team = data.teams.find((team) => team.id === teamString?.replace(/\s/g, ''));
+		const id = getKey(teamString);
+		console.log(`  Searching for team ID: ${id}`);
+		const team = data.teams.find((team) => team.id === id);
 		if (team) {
 			const years = yearString.split(', ');
 			console.log('  processing year string: ', yearString);
@@ -170,7 +172,7 @@
 <button on:click={_onSave} disabled={invalid}> Add Timeframe </button>
 
 <p>
-	<textarea bind:value={teamList} rows="10" cols="50"/>
+	<textarea bind:value={teamList} rows="10" cols="50" />
 	<button on:click={processText}> Add Timeframes </button>
 </p>
 
