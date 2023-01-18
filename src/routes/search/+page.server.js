@@ -1,21 +1,24 @@
-import firestore from '../../utils/firestore'
-import { collection, getDocs } from "firebase/firestore";
+import firestore from '../../utils/firestore';
+import { collection, getDocs } from 'firebase/firestore';
+import _ from 'lodash';
 
 export async function load() {
-
 	const teams = [];
 	const players = [];
 
-	const querySnapshot = await getDocs(collection(firestore, "team"));
+	const querySnapshot = await getDocs(collection(firestore, 'team'));
 	querySnapshot.forEach((doc) => {
-		teams.push({id: doc.id, ...doc.data()})
+		teams.push({ id: doc.id, ...doc.data() });
 	});
 
-	const playerQuery = await getDocs(collection(firestore, "players"));
+	const playerQuery = await getDocs(collection(firestore, 'players'));
 	playerQuery.forEach((doc) => {
 		console.log(JSON.stringify(doc.data()));
-		players.push({id: doc.id, ...doc.data()})
+		players.push({ id: doc.id, ...doc.data() });
 	});
 
-	return {teams, players};
+	return {
+		teams: _.sortBy(teams, ['location', 'team']),
+		players: _.sortBy(players, ['startYear', 'endYear', 'lastName', 'firstName'])
+	};
 }
