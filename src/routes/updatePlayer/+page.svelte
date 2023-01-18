@@ -1,29 +1,45 @@
 <script>
 	import { doc, setDoc } from 'firebase/firestore';
 	import db from '../../utils/firestore';
+	import AddTimeframe from './addTimeframe.svelte';
 	import Modal from '../../components/Modal.svelte';
 	import { modal } from '../../stores/Modal.store.js';
-	import ManageTimeFrame from './manageTimeFrames.svelte';
-
+	import _ from 'lodash';
 	export let data;
 	let firstName = '';
 	let lastName = '';
+	let teams = [];
+	let role = 'player'
 	let focusAfterSave;
 
 	const resetPlayer = () => {
 		firstName = '';
 		lastName = '';
-		player.teams = []
+		teams = [];
+		role = 'player';
 		focusAfterSave.focus();
 	};
 
+	function addTeam(newTeam, newStart, newEnd, role) {
+		if ( newTeam ) {
+			teams.push({
+				team: newTeam.id,
+				displayTeam: `${newTeam.location} ${newTeam.team}`,
+				startYear: newStart,
+				endYear: newEnd || newStart,
+				role: role
+			});
+
+			teams = _.sortBy(teams, ['startYear']);
+		}
+	}
+
+	let player;
 	$: player = {
 		firstName: firstName,
 		lastName: lastName,
-		teams: player?.teams || []
+		teams: teams
 	};
-
-	$: id = `${firstName}${lastName}`.replace(/\s/g, '')
 
 	const pasteFirstName = (e)=> {
 		// Get pasted data via clipboard API
@@ -36,8 +52,8 @@
 	}
 
 	async function save() {
-		console.log(`Creating document: ${id}`, player);
-		await setDoc(doc(db, 'players', id), player);
+		console.log(`Creating document: ${firstName}${lastName}.replace(/\\s/g, '')`, player);
+		await setDoc(doc(db, 'players', `${firstName}${lastName}.replace(/\\s/g, '')`), player);
 		resetPlayer();
 	}
 </script>
@@ -53,9 +69,15 @@
 		<input id="lastName" autocomplete="off" bind:value={lastName} />
 	</div>
 
-	<ManageTimeFrame bind:data={data} bind:teams={player.teams} />
+	<h2>Add Played For Timeframe</h2>
+
+	{#each teams as team}
+		<p>{team.displayTeam}{#if team.role !== 'player'}({team.role}){/if} {team.startYear} {#if team.endYear !== team.startYear}- {team.endYear} {/if}</p>
+	{/each}
+
+	<AddTimeframe {data} bind:role={role} onSave={addTeam} />
 
 	<p>
-		<button on:click={save}>Save {id}</button>
+		<button on:click={save}>Save {firstName}{lastName}</button>
 	</p>
 </Modal>
