@@ -1,12 +1,12 @@
 <script>
 	import TeamSelectField from '../../components/teamSelectField.svelte';
 	import _ from 'lodash';
-	let selected;
+	export let selected;
 	let focusAfterSave;
 	export let role = 'player';
 	export let data;
-	let startYear;
-	let endYear;
+	export let startYear = '';
+	export let endYear = '';
 	export let onSave = () => {};
 	let teamList;
 	let teamOutput = '';
