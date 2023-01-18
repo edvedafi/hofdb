@@ -170,7 +170,7 @@
 <button on:click={_onSave} disabled={invalid}> Add Timeframe </button>
 
 <p>
-	<textarea bind:value={teamList} />
+	<textarea bind:value={teamList} rows="10" cols="50"/>
 	<button on:click={processText}> Add Timeframes </button>
 </p>
 
