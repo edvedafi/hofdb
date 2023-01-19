@@ -1,7 +1,6 @@
 import firestore from '../../utils/firestore';
 import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
 import _ from 'lodash';
-import { data } from './+page.svelte';
 
 export async function load({ url }) {
 	const teams = [];
