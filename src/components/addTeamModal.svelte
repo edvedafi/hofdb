@@ -1,23 +1,34 @@
 <script>
-	import { getContext } from 'svelte';
+	import { getContext, onDestroy } from 'svelte';
 	import { doc, setDoc } from 'firebase/firestore';
 	import db from '../utils/firestore';
+	import LeagueSelect from '../routes/manageTeams/leagueSelectField.svelte';
+	import leagueStore  from '../stores/leagueStore';
+
 	export let onCancel = () => {};
 	export let onOkay = () => {};
 
 	const { close } = getContext('simple-modal');
+	let leagueList;
+
+	const unsubscribe = leagueStore().data.subscribe((leagueData) => {
+		leagueList = leagueData.leagues;
+	});
+	onDestroy(unsubscribe);
 
 	let teamLocation;
 	let teamName;
 	let newTeam;
 	let startYear;
 	let endYear;
+	let league;
 	$: {
 		newTeam = {
 			id: `${teamLocation}${teamName}`?.replace(/\s/g, ''),
 			team: teamName,
 			location: teamLocation,
-			startYear: startYear
+			startYear: startYear,
+			league: league
 		};
 		if (endYear) {
 			newTeam.endYear = endYear;
@@ -40,6 +51,12 @@
 
 <h2>New Team</h2>
 
+<label>League</label>
+<LeagueSelect
+	leagues={leagueList}
+	bind:selected={league}
+/>
+<br />
 <label for="location">Location</label>
 <input
 	id="location"
